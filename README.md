@@ -1,2 +1,4 @@
 # CppAssignmentApp
-# CppAssignmentApp
+
+つくるもの：
+規則：
