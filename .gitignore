@@ -50,6 +50,7 @@ ehthumbs_vista.db
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+dist/
 
 # Windows Installer files
 *.cab
