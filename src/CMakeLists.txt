@@ -1,2 +1,3 @@
-add_executable(CppAssignmentApp main.cpp)
-target_link_libraries(CppAssignmentApp lib)
+add_executable(Main main.cpp)
+# a.outをコンパイルする際にgreetingsをリンクする
+#target_link_libraries(Main Lib)
