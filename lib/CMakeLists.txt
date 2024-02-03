@@ -1,6 +1,6 @@
 add_library(Lib SHARED
         calc.hpp
-        render.hpp
+        Game.hpp
         bar.hpp
         )
 # インクルードディレクトリを指定
