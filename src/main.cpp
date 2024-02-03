@@ -1,10 +1,8 @@
-#include <iostream>
-#include <string>
-#include "../lib/calc.hpp"
-#include "../lib/Game.hpp"
+#include "../lib/AllLib.hpp"
 using namespace std;
 
 int main(void) {
-
+    srand(time(NULL));
+    pause();
     return 0;
 }

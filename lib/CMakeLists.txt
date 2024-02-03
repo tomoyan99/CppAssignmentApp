@@ -1,10 +1,9 @@
 add_library(Lib SHARED
-        calc.hpp
-        Game.hpp
-        bar.hpp
-        MultiPlotter.hpp
+        pause.hpp
+        AllLib.hpp
         )
 # インクルードディレクトリを指定
 target_include_directories(Lib
     PUBLIC ${PROJECT_SOURCE_DIR}/lib
+    PUBLIC ${PROJECT_SOURCE_DIR}/lib/classes
 )
