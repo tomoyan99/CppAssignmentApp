@@ -1,8 +1,13 @@
 #include "../lib/AllLib.hpp"
-using namespace std;
 
 int main(void) {
     srand(time(NULL));
+    system("cls");
+    cout <<
+
     pause();
+
+
+
     return 0;
 }

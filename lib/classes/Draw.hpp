@@ -2,20 +2,19 @@
 #include "../AllLib.hpp"
 class Draw{
 private:
-    Hand tmpHands;
+    Hand hands;
     Card *C;
 public:
-    Draw(Hand hands){
-        tmpHands = hands;
+    Draw(){
         C = new Card();
         for (int i = 0; i < 3; ++i) {
-            hands["Human"][i]=C->draw();
-            hands["AI"][i]=C->draw();
+            hands["Human"].insert(C->draw());
+            hands["AI"].insert(C->draw());
         }
         phase();
     }
     void phase(){
-
+//        View view("[ドローフェイズ]",);
     }
-    Hand getHands(){return tmpHands;}
+    Hand getHands(){return hands;}
 };

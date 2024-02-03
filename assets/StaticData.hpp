@@ -2,11 +2,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 struct StaticData{
-   const string title = "ビックバン・ジャック";
+   const string title = "HIGH・ジャック";
    const string explanation = "このゲームのコンセプトは\n"
-                              "ブラックジャック x バトルです.\n"
+                              "ブラックジャック x バトルです。\n"
                               "ブラックジャックのゲーム性を主軸に、HP制や特殊効果を追加することで\n"
-                              "よりアクティブなものに仕上げました";
+                              "よりアクティブなものに仕上げました。";
    const vector<string> rule  = {
            {"[基本ルール]\n"
             "基本はブラックジャックと同じく、カードを引いた出目が21に近づくようにします。\n"

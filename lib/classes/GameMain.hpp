@@ -2,31 +2,23 @@
 #include "../AllLib.hpp"
 class GameMain{
 private:
-    Hand hands={
-            {"Human",{}},
-            {"AI",{}}
-    };
-    Damage dameges = {
-            {"Human",{}},
-            {"AI",{}}
-    };
     HP hps={
-            {"Human",{}},
-            {"AI",{}}
+            {"Human",100},
+            {"AI",100}
     };
-
-
+    Result result={"NO_CONTEST","WIN","LOSE","DRAW"};
 public:
     GameMain(){
         tern();
     }
     void tern(){
-        Draw D(hands);
-        hands = D.getHands();
+        Draw D;
+        Hand hands = D.getHands();
         Effect E(hands);
-        damages = E.getDameges();
+        Damage damages = E.getDamages();
         Attack A(hps,damages);
         hps = A.getHps();
-
+        Judge J(hps);
+        result = J.getResult();
     }
 };
