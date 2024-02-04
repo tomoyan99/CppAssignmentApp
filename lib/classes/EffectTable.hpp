@@ -1,31 +1,28 @@
 #pragma once
 #include "../AllLib.hpp"
-typedef vector<string> Table;
-
 class EffectTable{
 private:
     map<int,string> table = {
-            {0,"+-------+-----------------------------------+\n"
-               "|カード\t|効果\t\t\t\t    |\n"
-               "+-------+-----------------------------------+\n"},
-            {1,"| 1\t| 与ダメージ1.4倍\t            |\n"},
-            {2,"| 2\t| 被ダメージ+10\t\t\t    |\n"},
-            {3,"| 3\t| なし\t\t\t\t    |\n"},
-            {4,"| 4\t| 与ダメージ+5\t\t\t    |\n"},
-            {5,"| 5\t| なし\t\t\t\t    |\n"},
-            {6,"| 6\t| なし\t\t\t\t    |\n"},
-            {7,"| 7\t| HP15回復\t\t\t    |\n"},
-            {8,"| 8\t| なし\t\t\t\t    |\n"},
-            {9,"| 9\t| なし\t\t\t\t    |\n"},
-            {10,"| 10\t| 被ダメージ-10\t\t\t    |\n"},
-            {11,"| 11\t| なし\t\t\t\t    |\n"},
-            {12,"| 12\t| 自分の手札を一枚ランダムに捨てる  |\n"},
-            {13,"| 13\t| 相手の手札を一枚ランダムに捨てる  |\n"},
-            {14,"+-------+-----------------------------------+\n"},
-    };
+            {0,"+-------+-----------------------------------+"},
+            {1,"|カード | 効果                              |"},
+            {2,"+-------+-----------------------------------+"},
+            {3,"| 1     | 攻撃力1.4倍                       |"},
+            {4,"| 2     | 攻撃力-10                         |"},
+            {5,"| 3     | なし                              |"},
+            {6,"| 4     | 攻撃力+10                         |"},
+            {7,"| 5     | 攻撃力0.8倍                       |"},
+            {8,"| 6     | なし                              |"},
+            {9,"| 7     | HP15回復                          |"},
+            {10,"| 8     | 自分の手札を一枚ランダムに捨てる  |"},
+            {11,"| 9     | 相手の手札を一枚ランダムに捨てる  |"},
+            {12,"| 10    | なし                              |"},
+            {13,"+-------+-----------------------------------+"},
+            };
+    int table_end_index = table.size()-1;
+    int bias = 2;
     bool isEffect(int eff_num){
         //effectのlist
-        vector<int>eff_list = {1,2,4,7,10,12,13};
+        vector<int>eff_list = {1,2,4,7,8,9};
         // find関数を使用して数字を検索
         auto it = std::find(eff_list.begin(), eff_list.end(),eff_num);
         // 数字が見つかったかを確認
@@ -43,13 +40,20 @@ private:
         }
         vector<string>new_table;
         new_table.push_back(table[0]);
+        new_table.push_back(table[1]);
+        new_table.push_back(table[2]);
+        UniqueHand effect_hands;
         //手がeffectを持ってたらtableに加える
         for (int eff_num:unique_hands[target]) {
             if(isEffect(eff_num)){
-                new_table.push_back(table[eff_num]);
+                effect_hands[target].insert(eff_num);
+                new_table.push_back(table[eff_num+bias]);
             }
         }
-        new_table.push_back(table[table.size()-1]);
+        if(effect_hands[target].size() == 0){
+            new_table.push_back({"|       | なし                              |"});
+        }
+        new_table.push_back(table[table_end_index]);
         return new_table;
     }
 public:
@@ -57,8 +61,24 @@ public:
     void showTable(Hand hands,string target){
         Table new_table = createEffTable(hands,target);
         for (string record:new_table) {
-            cout << record;
+            cout << record << endl;
         }
+    }
+    Table getRawTable(){
+        vector<string>new_table;
+        for (int i = 0; i < table.size(); ++i) {
+          new_table.push_back(table[i]);
+        }
+        return new_table;
+    }
+    Table getDummyTable(){
+        vector<string>new_table;
+        new_table.push_back(table[0]);
+        new_table.push_back(table[1]);
+        new_table.push_back(table[2]);
+        new_table.push_back({"| ※ [AI]の手札は次のフェイズで開示されます  |"});
+        new_table.push_back(table[table_end_index]);
+        return new_table;
     }
     Table getTable(Hand hands,string target){
         return createEffTable(hands,target);

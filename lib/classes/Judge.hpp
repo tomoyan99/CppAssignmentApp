@@ -1,13 +1,53 @@
-ï»¿#pragma once
+#pragma once
 #include "../AllLib.hpp"
+
 
 class Judge{
 private:
-    HP hps;
-    Result result;
+    Status S;
 public:
-    Judge(HP h){
-        hps = h;
+    Judge(Status s){
+        S = s;
+        phase();
     }
-    Result getResult(){return result;}
+    void phase(){
+        vector<string> result_list = {"NO_CONTEST","WIN","LOSE","DRAW"};
+        //ƒm[ƒRƒ“
+        if(S.hps["Human"] > 0 && S.hps["AI"] > 0){
+            S.result = result_list[0];
+        };
+        //ƒhƒ[
+        if(S.hps["Human"] == 0 && S.hps["AI"] == 0){
+            S.result = result_list[3];
+        };
+        //•‰‚¯
+        if(S.hps["Human"] == 0 && S.hps["AI"] > 0){
+            S.result = result_list[2];
+        };
+        //Ÿ‚¿
+        if(S.hps["Human"] > 0 && S.hps["AI"] == 0){
+            S.result = result_list[1];
+        };
+
+        MyView MV("ƒWƒƒƒbƒWƒtƒFƒCƒY",S);
+        if (S.result == "NO_CONTEST"){
+            MV.addLog(S.result+"!!");
+            Sleep(500);
+            MV.logPause("Ÿ‚Ìƒ^[ƒ“‚ÉˆÚ‚è‚Ü‚· ");
+            return;
+        }
+        if (S.result == "WIN" || S.result == "LOSE"){
+            MV.addLog("YOU "+S.result+"!!");
+            Sleep(500);
+            S.is_continue = MV.logConfirm("ƒRƒ“ƒeƒBƒjƒ…[‚µ‚Ü‚·‚©H ");
+            return;
+        }
+        if (S.result == "DRAW"){
+            MV.addLog(S.result+"!!");
+            Sleep(500);
+            S.is_continue = MV.logConfirm("ƒRƒ“ƒeƒBƒjƒ…[‚µ‚Ü‚·‚©H ");
+            return;
+        }
+    }
+    Status getStatus(){return S;}
 };

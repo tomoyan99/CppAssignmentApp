@@ -6,4 +6,5 @@ add_library(Lib SHARED
 target_include_directories(Lib
     PUBLIC ${PROJECT_SOURCE_DIR}/lib
     PUBLIC ${PROJECT_SOURCE_DIR}/lib/classes
+    PUBLIC ${PROJECT_SOURCE_DIR}/lib/assets
 )

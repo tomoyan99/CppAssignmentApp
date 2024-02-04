@@ -1,13 +1,97 @@
-Ôªø#pragma once
+#pragma once
 #include "../AllLib.hpp"
 class Attack{
 private:
-    Damage damages;
-    HP hps;
-public:
-    Attack(HP h,Damage d){
-        damages = d;
-        hps = h;
+    Status S;
+    bool calcKillCh(Cards c){
+        int chance = 0;
+        chance = (int)(1.0 - (c.size() - 2)*0.2)*100;
+
+        return ((rand()%100+1)<=chance);
     }
-    HP getHps(){return hps;}
+public:
+    Attack(Status s){
+        S = s;
+        phase();
+    }
+    void phase(){
+        MyView MV("ÉAÉ^ÉbÉNÉtÉFÉCÉY",S);
+        pair<int,int> sumHands = {sumMultiset(S.hands["Human"]),sumMultiset(S.hands["AI"])};
+
+        pair<int,int> count = {0,0};
+        if(sumHands.first > 21 || sumHands.second > 21){
+            if(sumHands.first > 21){
+                MV.logPause("éËéDÇÃëçòaÇ™21Çí¥Ç¶ÇƒÇ¢ÇÈÇΩÇﬂ[Player]ÇÕçUåÇÇ≈Ç´Ç»Ç¢!! ");
+                count.first++;
+            }
+            if(sumHands.second > 21) {
+                MV.logPause("éËéDÇÃëçòaÇ™21Çí¥Ç¶ÇƒÇ¢ÇÈÇΩÇﬂ[AI]ÇÕçUåÇÇ≈Ç´Ç»Ç¢!! ");
+                count.second++;
+            }
+            if(count.first+count.second == 2){
+                MV.logPause("Ç«ÇøÇÁÇ‡çUåÇÇ≈Ç´Ç∏ÅAèüïâÇÕÇ®óaÇØÇ∆Ç»Ç¡ÇΩÅcÅc Å®éüÇÃÉ^Å[ÉìÇ…ë±Ç≠");
+                return;
+            }
+        }
+        if(count.first == 0){
+            MV.logClear();
+            if(sumHands.first == 21){
+                MV.logPause("\x1b[37mäméEÉ`ÉÉÉìÉXî≠ê∂ÅIÅI\x1b[39m ");
+                MV.logPause("äméEÉ`ÉÉÉìÉXÅEÅEÅEÇªÇÍÇÕèoñ⁄Ç™21ÇÃé“ÇÃÇ›Ç…ó^Ç¶ÇÁÇÍÇÈÉ`ÉÉÉìÉX ");
+                MV.logPause("ìñÇΩÇÍÇŒÉ_ÉÅÅ[ÉW100É|ÉCÉìÉgè„èÊÇπÅI ");
+                MV.logPause("åãâ ÇÕÅEÅEÅEÅEÅEÅE ");
+                Sleep(3000);
+                MV.logClear();
+                Sleep(500);
+                if(calcKillCh(S.hands["Human"])){
+                    MV.addLog("\x1b[31mäm                 éE\x1b[39m");
+                    Sleep(500);
+                    MV.addLog("É_ÉÅÅ[ÉWÇ…100É|ÉCÉìÉgÇ™è„èÊÇπÇ≥ÇÍÇ‹Ç∑ ");
+                    S.dmgs["Human"]+=100;
+                    MV.reloadData("ÉAÉ^ÉbÉNÉtÉFÉCÉY",S);
+                    MV.render();
+                }else{
+                    MV.addLog("écîOÅEÅEÅEäméEÇ»ÇÁÇ∏ ");
+                }
+            }
+            MV.logPause("[Player]ÇÃçUåÇÅIÅI ");
+            MV.logPause("[AI]Ç…"+ to_string(S.dmgs["Human"])+"É_ÉÅÅ[ÉW!! ");
+            if (S.hps["AI"]-S.dmgs["Human"]>0){
+                S.hps["AI"]-=S.dmgs["Human"];
+            }else{
+                S.hps["AI"] = 0;
+            }
+            MV.reloadData("ÉAÉ^ÉbÉNÉtÉFÉCÉY",S);
+            MV.render();
+
+        }
+        if(count.second == 0){
+            MV.logClear();
+            if(sumHands.second == 21){
+                MV.logPause("\x1b[37mäméEÉ`ÉÉÉìÉXî≠ê∂ÅIÅI\x1b[39m ");
+                MV.logPause("åãâ ÇÕÅEÅEÅEÅEÅEÅE ");
+                Sleep(1000);
+                if(calcKillCh(S.hands["Human"])){
+                    MV.addLog("\x1b[31mäm                 éE\x1b[39m");
+                    Sleep(500);
+                    MV.addLog("É_ÉÅÅ[ÉWÇ…100É|ÉCÉìÉgÇ™è„èÊÇπÇ≥ÇÍÇ‹Ç∑ ");
+                    S.dmgs["AI"]+=100;
+                    MV.reloadData("ÉAÉ^ÉbÉNÉtÉFÉCÉY",S);
+                    MV.render();
+                }else{
+                    MV.addLog("écîOÅEÅEÅEäméEÇ»ÇÁÇ∏ ");
+                }
+            }
+            MV.logPause("[AI]ÇÃçUåÇÅIÅI ");
+            MV.logPause("[Player]Ç…"+ to_string(S.dmgs["AI"])+"É_ÉÅÅ[ÉW!! ");
+            if (S.hps["Human"]-S.dmgs["AI"]>0){
+                S.hps["Human"]-=S.dmgs["AI"];
+            }else{
+                S.hps["Human"] = 0;
+            }
+            MV.reloadData("ÉAÉ^ÉbÉNÉtÉFÉCÉY",S);
+            MV.render();
+        }
+    }
+    Status getStatus(){return S;}
 };

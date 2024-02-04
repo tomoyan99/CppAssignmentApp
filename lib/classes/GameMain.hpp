@@ -1,24 +1,46 @@
 #pragma once
 #include "../AllLib.hpp"
+
 class GameMain{
 private:
-    HP hps={
-            {"Human",100},
-            {"AI",100}
+    Status S;
+    Plot plot_data={
+            {"x",{}},
+            {"y_Human",{}},
+            {"y_AI",{}}
     };
-    Result result={"NO_CONTEST","WIN","LOSE","DRAW"};
 public:
     GameMain(){
-        tern();
+        plot_data["x"].push_back(S.tern);
+        plot_data["y_Human"].push_back(S.hps["Human"]);
+        plot_data["y_AI"].push_back(S.hps["AI"]);
+        do {
+            S.tern++;
+            ternLoop();
+            plot_data["x"].push_back(S.tern);
+            plot_data["y_Human"].push_back(S.hps["Human"]);
+            plot_data["y_AI"].push_back(S.hps["AI"]);
+
+            if (S.result == "WIN" ||S.result == "LOSE"||S.result == "DRAW"){
+                S.tern = 0;
+                S.hps["Human"] = 100;
+                S.hps["AI"] = 100;
+            }
+        }while(S.is_continue);
     }
-    void tern(){
-        Draw D;
-        Hand hands = D.getHands();
-        Effect E(hands);
-        Damage damages = E.getDamages();
-        Attack A(hps,damages);
-        hps = A.getHps();
-        Judge J(hps);
-        result = J.getResult();
+    void ternLoop(){
+        S.hands = {};
+        S.dmgs["Human"]=0;
+        S.dmgs["AI"]=0;
+        Draw D(S);
+        S = D.getStatus();
+        Effect E(S);
+        S = E.getStatus();
+        Attack A(S);
+        S = A.getStatus();
+        Judge J(S);
+        S = J.getStatus();
     }
+    Plot getPlotData(){return plot_data;}
+    Status getStatus(){return S;}
 };

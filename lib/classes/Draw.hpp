@@ -1,20 +1,61 @@
-ï»¿#pragma once
+#pragma once
 #include "../AllLib.hpp"
 class Draw{
 private:
-    Hand hands;
+    Status S;
     Card *C;
 public:
-    Draw(){
+    Draw(Status s){
+        S = s;
         C = new Card();
         for (int i = 0; i < 3; ++i) {
-            hands["Human"].insert(C->draw());
-            hands["AI"].insert(C->draw());
+            S.hands["Human"].insert(C->draw());
+            S.hands["AI"].insert(C->draw());
         }
         phase();
     }
     void phase(){
-//        View view("[ãƒ‰ãƒ­ãƒ¼ãƒ•ã‚§ã‚¤ã‚º]",);
+        pair<bool,bool> checkDraw={true,true};
+        pair<bool,bool> isDraw;
+        pair<int,int> sumHands = {sumMultiset(S.hands["Human"]),sumMultiset(S.hands["AI"])};
+        S.dmgs["Human"]=sumHands.first;
+        S.dmgs["AI"]=sumHands.second;
+        MyView MV("ƒhƒ[ƒtƒFƒCƒY",S,true);
+        do {
+            sumHands = {sumMultiset(S.hands["Human"]),sumMultiset(S.hands["AI"])};
+            if (sumHands.first > 21){
+                checkDraw.first = false;
+                MV.logPause("[Player]‚ÌèD‘˜a‚ª21‚ğ’´‚¦‚Ä‚¢‚é‚½‚ßƒhƒ[o—ˆ‚Ü‚¹‚ñ");
+            }
+            if (sumHands.second > 21){
+                checkDraw.second = false;
+            }
+            if (checkDraw.first){
+                isDraw.first = MV.logConfirm("’Ç‰Á‚ÅƒJ[ƒh‚ğƒhƒ[‚µ‚Ü‚·‚©H");
+                if(isDraw.first){
+                    int d = C->draw();
+                    S.hands["Human"].insert(d);
+                    S.dmgs["Human"]+=d;
+                    MV.logPause("[Player]‚Íƒhƒ[‚ğ‘I‘ğ‚µ["+ to_string(d)+"]‚ğŠl“¾‚µ‚Ü‚µ‚½");
+                    MV.reloadData("ƒhƒ[ƒtƒFƒCƒY",S,true);
+                    MV.render();
+                }else{
+                    checkDraw.first = false;
+                }
+            }
+            if (checkDraw.second){
+                isDraw.second = AI(S.hands["AI"]);
+                if(isDraw.second){
+                    int d = C->draw();
+                    S.dmgs["AI"]+=d;
+                    S.hands["AI"].insert(d);
+                    MV.logPause("[AI]‚Íƒhƒ[‚ğ‘I‘ğ‚µ‚Ü‚µ‚½");
+                }else{
+                    checkDraw.second = false;
+                }
+            }
+        }while(checkDraw.first || checkDraw.second );//‚Ç‚Á‚¿‚©‚ªtrue‚È‚çŒp‘±
+        MV.logPause("‘o•ûƒhƒ[‚ª‘I‘ğ‚³‚ê‚Ü‚¹‚ñ‚Å‚µ‚½BŸ‚ÌƒtƒFƒCƒY‚Öi‚İ‚Ü‚·");
     }
-    Hand getHands(){return hands;}
+    Status getStatus(){return S;}
 };

@@ -1,22 +1,24 @@
-Ôªø#pragma once
+#pragma once
 #include "../AllLib.hpp"
 class Card{
 private:
     queue<int>deck;
 public:
     Card(){
-        //‰ªÆ„ÅÆvector
+        //âºÇÃvector
         vector<int>deck_temp;
-        for (int i = 1; i <= 52; ++i) {
-            deck_temp[i]=4;
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 1; j <= 10; ++j) {
+                deck_temp.push_back(j);
+            }
         }
-        //vector„Çí„Ç∑„É£„ÉÉ„Éï„É´
+        //vectorÇÉVÉÉÉbÉtÉã
         random_shuffle(deck_temp.begin(),deck_temp.end());
         for (int card:deck_temp) {
             deck.push(card);
         }
     }
-    //„Ç≠„É•„Éº„ÅÆÂÖàÈ†≠„Åã„ÇâÊï∞Â≠ó„ÇíÊåÅ„Å£„Å¶„Åè„Çã
+    //ÉLÉÖÅ[ÇÃêÊì™Ç©ÇÁêîéöÇéùÇ¡ÇƒÇ≠ÇÈ
     int draw(){
         int hand = deck.front();
         deck.pop();

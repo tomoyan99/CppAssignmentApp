@@ -1,12 +1,187 @@
-ï»¿#pragma once
+#pragma once
 #include "../AllLib.hpp"
+
 class Effect{
 private:
-    Hand hands;
-    Damage damages;
-public:
-    Effect(Hand h){
-        hands = h;
+    Status S;
+    struct Flug{
+        int a;
+        int b;
+        int c;
+        int d;
+        Flug(){
+            a = 0;
+            b = 0;
+            c = 0;
+            d = 0;
+        }
+    };
+
+    map<string,string>pn = {
+            {"Human","[Player]"},
+            {"AI","[AI]"},
+    };
+    vector<string>player_list = {"Human","AI"};
+    bool isEffect(int eff_num){
+        //effect‚Ìlist
+        vector<int>eff_list = {1,2,4,7,8,9};
+        // findŠÖ”‚ğg—p‚µ‚Ä”š‚ğŒŸõ
+        auto it = std::find(eff_list.begin(), eff_list.end(),eff_num);
+        // ”š‚ªŒ©‚Â‚©‚Á‚½‚©‚ğŠm”F
+        if (it != eff_list.end()) {
+            return true;//eff_num‚ÍƒGƒtƒFƒNƒg
+        } else {
+            return false;//eff_num‚ÍƒGƒtƒFƒNƒg‚Å‚Í‚È‚¢
+        }
     }
-    Damage getDamages(){return damages;}
+    Damage calcDamage(Status s,map<string,Flug> mf){
+        s.dmgs["Human"]= sumMultiset(s.hands["Human"])
+                *pow(1.4,mf["Human"].a)
+                *pow(0.8,mf["Human"].b)
+                +(10*mf["Human"].c)
+                +(-10*mf["Human"].d);
+        s.dmgs["AI"]= sumMultiset(s.hands["AI"])
+                         *pow(1.4,mf["AI"].a)
+                         *pow(0.8,mf["AI"].b)
+                         +(10*mf["AI"].c)
+                         +(-10*mf["AI"].d);
+        return s.dmgs;
+    }
+
+    //UŒ‚—Í1.4”{
+    Damage effectOne(Damage dmg,string me,string you,MyView MV){
+        dmg[me]*=1.4;
+        return dmg;
+    }
+    //UŒ‚—Í-10
+    Damage effectTwo(Damage dmg,string me,string you,MyView MV){
+        dmg[me]-=10;
+        return dmg;
+    }
+    //UŒ‚—Í+10
+    Damage effectFour(Damage dmg,string me,string you,MyView MV){
+        dmg[me]+=10;
+        return dmg;
+    }
+    //UŒ‚—Í0.8”{
+    Damage effectFive(Damage dmg,string me,string you,MyView MV){
+        dmg[me] *= 0.8;
+        return dmg;
+    }
+    //HP‚ğ15‰ñ•œ
+    HP effectSeven(HP hps,string me,string you,MyView MV){
+        if (hps[me]+15 < 100){
+            hps[me]+=15;
+        }else if (hps[me]+15 >= 100){
+            hps[me] = 100;
+            MV.logPause("‚µ‚©‚µHP‚ª–ƒ^ƒ“‚¾‚Á‚½‚Ì‚Å‰ñ•œ‚µ‚È‚©‚Á‚½I ");
+        }
+        return hps;
+    }
+    //me(©•ª)‚ÌèD‚ğƒ‰ƒ“ƒ_ƒ€‚Åˆê–‡Ì‚Ä‚é
+    void effectEight(Hand& hands,string me,string you,MyView MV){
+        int me_hand_size = hands[me].size();
+        // multiset‚©‚çƒ‰ƒ“ƒ_ƒ€‚É—v‘f‚ğ‘I‚Ô
+        if (me_hand_size > 0) {
+            int r;
+            r = rand() % me_hand_size;
+            auto it = next(hands[me].begin(), r);
+            int rand_elem = *it;
+            auto range = hands[me].equal_range(rand_elem);
+            auto it2 = hands[me].erase(range.first);
+            MV.logPause(to_string(rand_elem)+"‚ÌƒJ[ƒh‚ª”jŠü‚³‚ê‚Ü‚µ‚½I ");
+        }else{
+            MV.logPause("‚µ‚©‚µA"+pn[me]+"‚É‚ÍÌ‚Ä‚ç‚ê‚éƒJ[ƒh‚ªc‚Á‚Ä‚¢‚È‚¢I ");
+        }
+    }
+    //you(‘Šè)‚ÌèD‚ğƒ‰ƒ“ƒ_ƒ€‚Å1–‡Ì‚Ä‚é
+    void effectNine(Hand& hands,string me,string you,MyView MV){
+        int me_hand_size = hands[you].size();
+        // multiset‚©‚çƒ‰ƒ“ƒ_ƒ€‚É—v‘f‚ğ‘I‚Ô
+        if (me_hand_size > 0) {
+            int r = rand() % me_hand_size;
+            auto it = next(hands[you].begin(), r);
+            int rand_elem = *it;
+            auto range = hands[you].equal_range(rand_elem);
+            auto it2 = hands[you].erase(range.first);
+            MV.logPause(to_string(rand_elem)+"‚ÌƒJ[ƒh‚ª”jŠü‚³‚ê‚Ü‚µ‚½I ");
+        }else{
+            MV.logPause("‚µ‚©‚µA"+pn[you]+"‚É‚ÍÌ‚Ä‚ç‚ê‚éƒJ[ƒh‚ªc‚Á‚Ä‚¢‚È‚¢I ");
+        }
+    }
+
+public:
+    Effect(Status s){
+        S = s;
+        phase();
+    }
+    void phase(){
+        map<string,Flug>mf = {
+                {"Human",{}},
+                {"AI",{}}
+        };
+        MyView MV("ƒGƒtƒFƒNƒgƒtƒFƒCƒY",S);
+        bool cond = rand()%2 == 0;
+        string which_first = (cond)?"Human":"AI";//æsŒˆ‚ß‚é(0‚ªƒvƒŒƒCƒ„[,1‚ªAI)
+        string which_second = (!cond)?"Human":"AI";//ŒãUŒˆ‚ß‚é(0‚ªƒvƒŒƒCƒ„[,1‚ªAI)
+
+        //æs‚©‚çƒXƒ^[ƒg
+        for (int i = 0; i < 2; ++i) {
+            MV.logClear();
+            if(i==0){MV.logPause("æs‚Í"+pn[which_first]+"‚©‚ç‚Å‚· ");}
+            if(i==1){MV.logPause("ŒãU‚Í"+pn[which_first]+"‚©‚ç‚Å‚· ");}
+            for (int n :S.hands[which_first]) {
+                if (isEffect(n)){
+                    switch (n) {
+                        case 1:
+                            mf[which_first].a++;
+                            MV.logPause("ƒJ[ƒh1‚ÌŒø‰Ê‚Å"+pn[which_first]+"‚ÌUŒ‚—Í1.4”{! ");
+                            S.dmgs = effectOne(S.dmgs,which_first,which_second,MV);
+                            break;
+                        case 2:
+                            mf[which_first].d++;
+                            MV.logPause("ƒJ[ƒh2‚ÌŒø‰Ê‚Å"+pn[which_first]+"‚ÌUŒ‚—Í-10! ");
+                            S.dmgs = effectTwo(S.dmgs,which_first,which_second,MV);
+                            break;
+                        case 4:
+                            mf[which_first].c++;
+                            MV.logPause("ƒJ[ƒh4‚ÌŒø‰Ê‚Å"+pn[which_first]+"‚ÌUŒ‚—Í+10! ");
+                            S.dmgs = effectFour(S.dmgs,which_first,which_second,MV);
+                            break;
+                        case 5:
+                            mf[which_first].b++;
+                            MV.logPause("ƒJ[ƒh5‚ÌŒø‰Ê‚Å"+pn[which_first]+"‚ÌUŒ‚—Í0.8”{! ");
+                            S.dmgs =effectFive(S.dmgs,which_first,which_second,MV);
+                            break;
+                        case 7:
+                            MV.logPause("ƒJ[ƒh7‚ÌŒø‰Ê‚Å"+pn[which_first]+"‚ÌHP‚ª15‰ñ•œ! ");
+                            S.hps = effectSeven(S.hps,which_first,which_second,MV);
+                            break;
+                        case 8:
+                            MV.logPause("ƒJ[ƒh8‚ÌŒø‰Ê‚Å"+pn[which_first]+"‚ÌèD‚ğˆê–‡”jŠü! ");
+                            effectEight(S.hands,which_first,which_second,MV);
+                            Sleep(300);
+                            break;
+                        case 9:
+                            MV.logPause("ƒJ[ƒh9‚ÌŒø‰Ê‚Å"+pn[which_second]+"‚ÌèD‚ğ1–‡”jŠü! ");
+                            effectNine(S.hands,which_first,which_second,MV);
+                            Sleep(300);
+                            break;
+                    }
+                    S.dmgs = calcDamage(S,mf);
+                    if (S.dmgs[which_first] < 0){
+                        S.dmgs[which_first] = 0;
+                    }
+                    if (S.dmgs[which_second] < 0){
+                        S.dmgs[which_second] = 0;
+                    }
+
+                    MV.reloadData("ƒGƒtƒFƒNƒgƒtƒFƒCƒY",S);
+                    MV.render();
+                }
+            }
+            swap(which_first,which_second);//æsŒãU“ü‚ê‘Ö‚¦
+        }
+    }
+    Status getStatus(){return S;}
 };
